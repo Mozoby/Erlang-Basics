@@ -1,5 +1,5 @@
 -module(setv1).
--export([run/0]).
+-export([run/0, union_set/2]).
 
 run() ->
  live_analysis(get_test_data()).
@@ -47,16 +47,16 @@ iterate_blocks(Blocks, [B | BTail], BIndex, InSets, AccOutSets, InSetsAcc, Chang
 	if
 		Change == true ->
 			NewChange = true;
-		DidChange == true ->
+		DidChange == false ->
 			NewChange = true;
 		true ->
 			NewChange = false
 	end,
 
-	iterate_blocks(Blocks, BTail, BIndex + 1, InSets, [AccOutSets | NewOut], [InSetsAcc | NewIn], NewChange);
+	iterate_blocks(Blocks, BTail, BIndex + 1, InSets, [NewOut | AccOutSets], [NewIn | InSetsAcc], NewChange);
 
 iterate_blocks(Blocks, [], BIndex, InSets, AccOutSets, InSetsAcc, Change) ->
-	{Change, InSetsAcc, AccOutSets}.
+	{Change, lists:reverse(InSetsAcc), lists:reverse(AccOutSets)}.
 
 get_out_set(B, Blocks, [Successor | More],InSets, OutSetAcc) ->
 	get_out_set(B, Blocks, More, InSets, 
